@@ -8,7 +8,7 @@ version = "0.1.0a3"
 description = "Pathl - biblioteka ogólnego przeznaczenia"
 readme = "README.md"
 requires-python = ">=3.8"
-license = "MIT"
+license = {text = "MIT"}
 authors = [
     {name = "Alicja", email = "alicjajett@gmail.com"},
 ]
