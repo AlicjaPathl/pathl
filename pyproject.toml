@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pathl"
-version = "0.1.0-a1"
+version = "0.1.0a2"
 description = "Pathl - biblioteka ogólnego przeznaczenia"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -29,6 +29,7 @@ dev = [
     "isort>=5.12.0",
     "flake8>=6.0.0",
     "mypy>=1.0.0",
+    "cibuildwheel>=2.16.0",
 ]
 cli = ["click>=8.0.0"]
 gui = []
@@ -41,12 +42,16 @@ Repository = "https://github.com/AlicjaPathl/pathl.git"
 [project.scripts]
 pathl = "pathl.cli.main:main"
 
-# Konfiguracja dla setuptools - szukamy w katalogu pathl
+# Konfiguracja setuptools - szukamy pakietów w katalogu pathl
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["pathl*", "pathl.*"]
 
-# Narzędzia deweloperskie
+# --- Rozszerzenie C ---
+# setuptools >=61 wspiera ext_modules tylko przez setup.py lub przez
+# [tool.setuptools] w połączeniu z osobnym plikiem build (patrz setup.py niżej,
+# potrzebny WYŁĄCZNIE do zdefiniowania modułu C - reszta metadanych zostaje w pyproject.toml)
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"
@@ -58,3 +63,15 @@ target-version = ['py38', 'py39', 'py310', 'py311']
 [tool.isort]
 profile = "black"
 line_length = 88
+
+# --- Konfiguracja cibuildwheel (cross-build Linux + Windows) ---
+[tool.cibuildwheel]
+build = "cp38-* cp39-* cp310-* cp311-* cp312-*"
+skip = "*-musllinux* pp*"
+build-verbosity = 1
+
+[tool.cibuildwheel.linux]
+archs = ["x86_64"]
+
+[tool.cibuildwheel.windows]
+archs = ["AMD64"]

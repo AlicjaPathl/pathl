@@ -1,0 +1,109 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Rozszerzenia kompilowane (C extensions) ---
+*.so
+*.pyd
+*.dll
+*.dylib
+
+# --- Build / dystrybucja ---
+build/
+dist/
+*.egg-info/
+*.egg
+wheelhouse/
+*.exe
+
+# --- Środowiska wirtualne ---
+.venv
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.python-version
+
+# --- Testy / pokrycie kodu / typowanie ---
+.pytest_cache/
+.coverage
+.coverage.*
+*.cover
+htmlcov/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+.tox/
+.pyre/
+.pytype/
+
+# --- Sekrety / konfiguracja ---
+.env
+.env.local
+.env.*.local
+*.env
+*.env.local
+
+# --- Logi / pliki tymczasowe ---
+*.log
+*.log.*
+logs/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*.pid
+
+# --- Builder GUI (pliki wewnętrzne, nie do repo) ---
+builder_gui.py
+builder_auto.py
+run_builder.sh
+run_builder.bat
+pathl-builder.desktop
+
+# --- IDE ---
+.vscode/
+.idea/
+*.iml
+*.swp
+*.swo
+*~
+.pyproj
+*.sln
+*.suo
+*.user
+
+# --- System ---
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.directory
+
+# --- Jupyter / IPython ---
+.ipynb_checkpoints/
+profile_default/
+ipython_config.py
+
+# --- Zarządzanie zależnościami ---
+Pipfile.lock
+poetry.lock
+.pdm.toml
+__pypackages__/
+
+# --- Inne narzędzia ---
+celerybeat-schedule
+*.sage.py
+.spyderproject
+.spyproject
+.ropeproject
+site/
+*.spec
