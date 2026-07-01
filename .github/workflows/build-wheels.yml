@@ -106,3 +106,4 @@ jobs:
           packages-dir: dist-collected/
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
+          skip-existing: true # <-- Zapobiega wywalaniu błędu 400 przy powtórzeniach
