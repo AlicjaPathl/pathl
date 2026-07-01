@@ -7,15 +7,10 @@ on:
   workflow_dispatch: {}
 
 jobs:
-  # --- Build 1: Linux przenośny (manylinux) + Windows ---
-  build_wheels:
-    name: Build wheels on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-
+  # --- Build 1: Linux manylinux (cibuildwheel) ---
+  build_wheels_linux:
+    name: Build manylinux wheels
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -31,16 +26,45 @@ jobs:
         run: python -m cibuildwheel --output-dir wheelhouse
         env:
           CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*"
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+          CIBW_ARCHS: x86_64
 
       - name: Upload wheels artifact
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-${{ matrix.os }}
+          name: wheels-manylinux
           path: ./wheelhouse/*.whl
 
-  # --- Build 2: Debian (natywny, w kontenerze) ---
-  build_wheels_debian:
-    name: Build wheel on Debian
+  # --- Build 2: Windows ---
+  build_wheels_windows:
+    name: Build Windows wheels
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==2.19.2
+
+      - name: Build wheels
+        run: python -m cibuildwheel --output-dir wheelhouse
+        env:
+          CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*"
+          CIBW_ARCHS: AMD64
+
+      - name: Upload wheels artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-windows
+          path: ./wheelhouse/*.whl
+
+  # --- Build 3: Debian (natywny) ---
+  build_debian:
+    name: Build Debian wheel
     runs-on: ubuntu-latest
     container: debian:bookworm
     steps:
@@ -66,6 +90,84 @@ jobs:
           name: wheels-debian
           path: ./wheelhouse/*.whl
 
+  # --- Build 4: Fedora (natywny) ---
+  build_fedora:
+    name: Build Fedora wheel
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          dnf install -y python3 python3-pip python3-devel gcc gcc-c++ make
+
+      - name: Install build tools
+        run: python3 -m pip install --upgrade build twine
+
+      - name: Build wheel
+        run: python3 -m build --wheel --outdir wheelhouse
+
+      - name: Check wheel
+        run: twine check wheelhouse/*.whl
+
+      - name: Upload wheels artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-fedora
+          path: ./wheelhouse/*.whl
+
+  # --- Build 5: Alpine (musl) ---
+  build_alpine:
+    name: Build Alpine wheel
+    runs-on: ubuntu-latest
+    container: alpine:latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          apk add python3 py3-pip python3-dev gcc g++ musl-dev make
+
+      - name: Install build tools
+        run: python3 -m pip install --upgrade build twine
+
+      - name: Build wheel
+        run: python3 -m build --wheel --outdir wheelhouse
+
+      - name: Check wheel
+        run: twine check wheelhouse/*.whl
+
+      - name: Upload wheels artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-alpine
+          path: ./wheelhouse/*.whl
+
+  # --- Build 6: macOS (jeśli potrzebujesz) ---
+  # build_macos:
+  #   name: Build macOS wheels
+  #   runs-on: macos-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: "3.12"
+  #     - name: Install cibuildwheel
+  #       run: python -m pip install cibuildwheel==2.19.2
+  #     - name: Build wheels
+  #       run: python -m cibuildwheel --output-dir wheelhouse
+  #       env:
+  #         CIBW_BUILD: "cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*"
+  #         CIBW_ARCHS: x86_64 arm64
+  #     - name: Upload wheels artifact
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: wheels-macos
+  #         path: ./wheelhouse/*.whl
+
+  # --- Source distribution ---
   build_sdist:
     name: Build source distribution
     runs-on: ubuntu-latest
@@ -77,10 +179,11 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install build tools
+        run: python -m pip install build
+
       - name: Build sdist
-        run: |
-          python -m pip install build
-          python -m build --sdist
+        run: python -m build --sdist
 
       - name: Upload sdist artifact
         uses: actions/upload-artifact@v4
@@ -88,9 +191,10 @@ jobs:
           name: sdist
           path: dist/*.tar.gz
 
+  # --- Publish to PyPI ---
   publish:
     name: Publish to PyPI
-    needs: [build_wheels, build_wheels_debian, build_sdist]
+    needs: [build_wheels_linux, build_wheels_windows, build_debian, build_fedora, build_alpine, build_sdist]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
@@ -101,6 +205,14 @@ jobs:
         with:
           path: dist-collected
           merge-multiple: true
+
+      - name: List collected files
+        run: ls -la dist-collected/
+
+      - name: Check wheels
+        run: |
+          python -m pip install twine
+          twine check dist-collected/*.whl dist-collected/*.tar.gz 2>&1 || true
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
