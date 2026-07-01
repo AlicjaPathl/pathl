@@ -67,16 +67,38 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - name: Download all artifacts
+      - name: Download Linux wheels
         uses: actions/download-artifact@v4
         with:
+          name: wheels-ubuntu-latest-${{ github.run_id }}
           path: dist-collected
-          merge-multiple: true
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.run_id }}
 
-      - name: List files
-        run: ls -la dist-collected/
+      - name: Download Windows wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: wheels-windows-latest-${{ github.run_id }}
+          path: dist-collected
+
+      - name: Download sdist
+        uses: actions/download-artifact@v4
+        with:
+          name: sdist-${{ github.run_id }}
+          path: dist-collected
+
+      - name: List downloaded files
+        run: |
+          echo "📦 Files in dist-collected:"
+          ls -la dist-collected/
+          echo ""
+          echo "📄 File list:"
+          for f in dist-collected/*; do
+            echo "  $(basename $f)"
+          done
+
+      - name: Check wheels
+        run: |
+          python -m pip install twine
+          twine check dist-collected/*.whl dist-collected/*.tar.gz 2>&1 || true
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
