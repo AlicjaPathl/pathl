@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pathl"
+version = "0.1.0-a1"
+description = "Pathl - biblioteka ogólnego przeznaczenia"
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+authors = [
+    {name = "Alicja", email = "alicjajett@gmail.com"},
+]
+maintainers = [
+    {name = "Alicja", email = "alicjajett@gmail.com"}
+]
+dependencies = [
+    "httpx",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "build>=1.0.0",
+    "twine>=4.0.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+]
+cli = ["click>=8.0.0"]
+gui = []
+
+[project.urls]
+Homepage = "https://github.com/AlicjaPathl/pathl"
+Repository = "https://github.com/AlicjaPathl/pathl.git"
+"Bug Tracker" = "https://github.com/AlicjaPathl/pathl/issues"
+
+[project.scripts]
+pathl = "pathl.cli.main:main"
+
+# Konfiguracja dla setuptools - szukamy w katalogu pathl
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pathl*", "pathl.*"]
+
+# Narzędzia deweloperskie
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+
+[tool.black]
+line-length = 88
+target-version = ['py38', 'py39', 'py310', 'py311']
+
+[tool.isort]
+profile = "black"
+line_length = 88
