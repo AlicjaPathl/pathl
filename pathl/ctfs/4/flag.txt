@@ -1,0 +1,1 @@
+CTF{root_has_no_password_how_dangerous}

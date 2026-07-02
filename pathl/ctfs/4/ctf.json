@@ -1,0 +1,24 @@
+{
+    "name": "Ctf1",
+    "description": "",
+    "entry": {
+        "type": "docker",
+        "dockerfile": "Dockerfile",
+        "port": 23,
+        "host_port": 2323,
+        "image_name": "telnet-ctf-1",
+        "container_name": "telnet-ctf-1",
+        "timeout": 300
+    },
+    "author": "CTF Admin",
+    "difficulty": "łatwy",
+    "points": 100,
+    "questions": [
+        {
+            "question": "Jaka jest flaga w katalogu roota?",
+            "answer": "CTF{root_has_no_password_how_dangerous}",
+            "type": "text",
+            "hint": "Zaloguj się jako root i zgarnij  /root/flag.txt"
+        }
+    ]
+}

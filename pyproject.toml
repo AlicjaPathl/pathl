@@ -30,6 +30,7 @@ dev = [
     "flake8>=6.0.0",
     "mypy>=1.0.0",
     "cibuildwheel>=2.16.0",
+    "flask"
 ]
 cli = ["click>=8.0.0"]
 gui = []
@@ -41,7 +42,8 @@ Repository = "https://github.com/AlicjaPathl/pathl.git"
 
 [project.scripts]
 pathl = "pathl.cli.main:main"
-
+db = "pathl.cli.db:main"
+ctf = "pathl.ctf:main"
 # Konfiguracja setuptools - szukamy pakietów w katalogu pathl
 [tool.setuptools.packages.find]
 where = ["."]
