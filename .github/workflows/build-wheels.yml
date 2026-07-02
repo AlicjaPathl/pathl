@@ -64,8 +64,7 @@ jobs:
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
-    permissions:
-      id-token: write
+    # UWAGA: usunąłem permissions: id-token: write
     steps:
       - name: Download Linux wheels
         uses: actions/download-artifact@v4
@@ -106,4 +105,5 @@ jobs:
           packages-dir: dist-collected/
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
-          skip-existing: true # <-- Zapobiega wywalaniu błędu 400 przy powtórzeniach
+          skip-existing: true  # Zapobiega błędowi 400 przy powtórzeniach
+          verbose: true        # Dodane dla lepszego logowania - możesz usunąć później

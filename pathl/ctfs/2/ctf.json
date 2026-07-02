@@ -1,0 +1,16 @@
+{
+    "name": "WireShark",
+    "description": "Powodzenia",
+    "entry": "main:main",
+    "author": "Alice",
+    "difficulty": "łatwy",
+    "points": 100,
+    "questions": [
+        {
+            "question": "Jaka jest flaga?",
+            "answer": "FLAG{test}",
+            "type": "text",
+            "hint": "Sprawdź kod źródłowy"
+        }
+    ]
+}
